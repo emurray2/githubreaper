@@ -26,12 +26,16 @@ def loop():
 
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
-      origin.fetch()
-      reapy.print('Successfully fetched:', origin.name,'at:',origin.url,'branches:',origin.refs)
+      fetchOrigin()
 
     imgui_python.ImGui_End(ctx)
 
   if open:
     RPR_defer('loop()')
+
+def fetchOrigin(debugMode = False):
+  origin.fetch()
+  if debugMode:
+    reapy.print('Successfully fetched:', origin.name,'at:',origin.url,'branches:',origin.refs)
 
 RPR_defer('init()')
