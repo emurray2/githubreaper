@@ -13,3 +13,9 @@ reapy.print(project)
 repo = git.Repo(project.path)
 
 reapy.print(repo)
+
+# Fetch the origin
+origin = repo.remotes.origin
+origin.fetch()
+
+reapy.print(origin.refs)
