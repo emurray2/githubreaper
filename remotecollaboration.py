@@ -4,4 +4,6 @@
 import reapy
 
 # Find the Reaper project inside this repo
-project = reapy.Project()
+project = reapy.Project('remotecollaboration')
+
+reapy.print(project)
