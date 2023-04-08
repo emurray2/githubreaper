@@ -153,21 +153,24 @@ def deleteSelectedBranch(type: str):
     deleting_head = current_local_branch[0]
     repo.delete_head(deleting_head)
     local_branch_names.remove(deleting_head)
-    updateBranchList()
   if type == 'remote':
     # Store menu binding for deletion
     deleting_branch = str.split(current_remote_branch[0],'/')[1]
     # Set menu binding to default branch
     current_remote_branch[0] = origin.refs.main.name
-    with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
+
+    # Delete local branches if existent before remote (to avoid warnings)
+    if deleting_branch in repo.heads:
       repo.delete_head(deleting_branch)
       local_branch_names.remove(deleting_branch)
+    with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
       origin.push(refspec=(":%s" % deleting_branch))
-      updateBranchList()
+
   # Set menu binding to default branch
   current_local_branch[0] = repo.active_branch
   # Open the project for default branch
   reapy.open_project(project.path + '/remotecollaboration.rpp')
+  updateBranchList()
 
 def pushChanges():
   # Find changed files
