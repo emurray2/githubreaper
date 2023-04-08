@@ -111,8 +111,6 @@ def fetchOrigin(debugMode = False):
   git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
   git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
   with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-    repo.delete_remote(origin)
-    repo.create_remote('origin','https://github.com/emurray2/reaperfun')
     origin.fetch()
     origin.update()
     origin.push()
