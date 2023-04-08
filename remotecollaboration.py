@@ -126,7 +126,7 @@ def loop():
         git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
         git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
         with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-          if commit_message[0] == '':
+          if commit_message[0] == '' and new_branch_name == '':
             reapy.show_message_box("Please enter text for commit message", "Commit Failed")
           elif new_branch_name[0] != '':
             origin.push(new_branch_name[0])
