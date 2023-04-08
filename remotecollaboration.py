@@ -13,6 +13,7 @@
 # 7. Install ReaImGui through ReaPack: https://github.com/cfillion/reaimgui (currently using 0.8.5)
 
 import sys
+import os
 sys.path.append(RPR_GetResourcePath() + '/Scripts/ReaTeam Extensions/API')
 
 import imgui_python
@@ -107,9 +108,14 @@ def loop():
     RPR_defer('loop()')
 
 def fetchOrigin(debugMode = False):
-  ssh_cmd = 'ssh -i id_deployment_key'
-  with repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
+  git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
+  git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
+  with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
+    repo.delete_remote(origin)
+    repo.create_remote('origin','https://github.com/emurray2/reaperfun')
+    origin.fetch()
     origin.update()
+    origin.push()
 
   if debugMode:
     reapy.print('Successfully fetched:', origin.name)
