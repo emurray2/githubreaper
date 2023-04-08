@@ -119,6 +119,7 @@ def loop():
       files = repo.git.diff(None, name_only=True)
       with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
         origin.push(refspec=(":%s" % deleting_branch))
+        updateBranchList()
 
     (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message', commit_message[0])
     if show_textinput:
@@ -148,6 +149,7 @@ def loop():
           elif new_branch_name[0] != '':
             origin.push(new_branch_name[0])
             new_branch_name[0] = ''
+            updateBranchList()
           elif len(files) == 0:
             reapy.show_message_box("No files have changed.", "Commit Failed")
           else:
@@ -155,6 +157,7 @@ def loop():
               repo.git.add(f)
             repo.index.commit(commit_message[0])
             origin.push()
+            updateBranchList()
     imgui_python.ImGui_End(ctx)
 
   if open:
