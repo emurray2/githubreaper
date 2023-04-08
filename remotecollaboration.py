@@ -85,6 +85,17 @@ def loop():
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
       updateBranchList()
     cycleDropdown()
+    if imgui_python.ImGui_Button(ctx, 'Delete Selected Local Branch'):
+      # Store menu binding for deletion
+      deleting_head = current_local_branch[0]
+      # Set menu binding to default branch
+      current_local_branch[0] = repo.heads[0]
+      # Checkout default branch to avoid errors
+      repo.heads[0].checkout()
+      # Open the project for default branch
+      reapy.open_project(project.path + '/remotecollaboration.rpp')
+      repo.delete_head(deleting_head)
+      local_branch_names.remove(deleting_head)
     imgui_python.ImGui_End(ctx)
 
   if open:
