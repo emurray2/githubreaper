@@ -41,17 +41,21 @@ local_branch_names = []
 remote_branch_names = []
 
 def init():
+  updateBranchList()
+
   global ctx
   global current_local_branch
   global current_remote_branch
   global commit_message
   global new_branch_name
   ctx = imgui_python.ImGui_CreateContext('GitHub Reaper')
-  updateBranchList()
+
   current_local_branch = [repo.active_branch]
   current_remote_branch = [remote_branch_names[0]]
+
   commit_message = ['']
   new_branch_name = ['']
+
   loop()
 
 # Render cycle for drop-down menu
@@ -97,32 +101,11 @@ def loop():
     renderTextInput('New branch name',new_branch_name)
   
     if imgui_python.ImGui_Button(ctx, 'Create Branch'):
-      if new_branch_name[0] == '':
-        reapy.show_message_box("Please enter a name for the new branch.", "Branch Name Empty")
-      else:
-        new_branch = repo.create_head(new_branch_name[0])
-        new_branch.checkout()
-        local_branch_names.append(new_branch_name[0])
+      createBranch()
 
     if imgui_python.ImGui_Button(ctx, 'Push Changes'):
-        git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
-        git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
-        files = repo.git.diff(None, name_only=True)
-        with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-          if commit_message[0] == '' and new_branch_name[0] == '':
-            reapy.show_message_box("Please enter text for commit message", "Commit Failed")
-          elif new_branch_name[0] != '':
-            origin.push(new_branch_name[0])
-            new_branch_name[0] = ''
-            updateBranchList()
-          elif len(files) == 0:
-            reapy.show_message_box("No files have changed.", "Commit Failed")
-          else:
-            for f in files.split('\n'):
-              repo.git.add(f)
-            repo.index.commit(commit_message[0])
-            origin.push()
-            updateBranchList()
+      pushChanges()
+
     imgui_python.ImGui_End(ctx)
 
   if open:
@@ -150,6 +133,14 @@ def checkout(branch: str):
     repo.heads[ref.remote_head].checkout()
     current_local_branch[0] = str.split(branch,'/')[1]
 
+def createBranch():
+  if new_branch_name[0] == '':
+    reapy.show_message_box("Please enter a name for the new branch.", "Branch Name Empty")
+  else:
+    new_branch = repo.create_head(new_branch_name[0])
+    new_branch.checkout()
+    local_branch_names.append(new_branch_name[0])
+
 def deleteSelectedBranch(type: str):
   # Checkout default branch to avoid errors
   repo.heads.main.checkout()
@@ -171,6 +162,28 @@ def deleteSelectedBranch(type: str):
   # Open the project for default branch
   reapy.open_project(project.path + '/remotecollaboration.rpp')
 
+def pushChanges():
+  # Find changed files
+  files = repo.git.diff(None, name_only=True)
+  with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
+    # Check if commit message is empty and branch name is empty (otherwise user is creating a branch and not a commit)
+    if commit_message[0] == '' and new_branch_name[0] == '':
+      reapy.show_message_box("Please enter text for commit message", "Commit Failed")
+    # Branch is being created, check if user filled in the name and create it
+    elif new_branch_name[0] != '':
+      origin.push(new_branch_name[0])
+      new_branch_name[0] = ''
+      updateBranchList()
+    # If no files were changed, we can't do anything
+    elif len(files) == 0:
+      reapy.show_message_box("No files have changed.", "Commit Failed")
+    # Some files were changed as in a typical git commit, let's add those changes to remote
+    else:
+      for f in files.split('\n'):
+        repo.git.add(f)
+      repo.index.commit(commit_message[0])
+      origin.push()
+      updateBranchList()
 
 def updateBranchList(debugMode = False):
   fetchOrigin(debugMode = debugMode)
