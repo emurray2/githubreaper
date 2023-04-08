@@ -141,7 +141,7 @@ def createBranch():
     # Create new branch
     repo.head.reference = repo.create_head(branch_name)
     # Create new remote ref and set it to track.
-    rem_ref = reapy.RemoteReference(repo, f"refs/remotes/{remote_name}/{branch_name}")
+    rem_ref = git.RemoteReference(repo, f"refs/remotes/{remote_name}/{branch_name}")
     repo.head.reference.set_tracking_branch(rem_ref)
     local_branch_names.append(new_branch_name[0])
 
