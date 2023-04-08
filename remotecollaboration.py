@@ -125,6 +125,7 @@ def loop():
         # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
         git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
         git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
+        files = repo.git.diff(None, name_only=True)
         with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
           if commit_message[0] == '' and new_branch_name == '':
             reapy.show_message_box("Please enter text for commit message", "Commit Failed")
@@ -132,7 +133,7 @@ def loop():
             origin.push(new_branch_name[0])
             new_branch_name[0] = ''
           else:
-            files = repo.git.diff(None, name_only=True)
+            reapy.print(files)
             for f in files.split('\n'):
               repo.git.add(f)
             repo.index.commit(commit_message[0])
