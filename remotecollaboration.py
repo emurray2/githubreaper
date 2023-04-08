@@ -83,7 +83,7 @@ def loop():
 
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
-      updateBranchList(debugMode)
+      updateBranchList()
     cycleDropdown()
     imgui_python.ImGui_End(ctx)
 
