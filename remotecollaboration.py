@@ -134,8 +134,15 @@ def createBranch():
   if new_branch_name[0] == '':
     reapy.show_message_box("Please enter a name for the new branch.", "Branch Name Empty")
   else:
-    new_branch = repo.create_head(new_branch_name[0])
-    new_branch.checkout()
+    branch_name = new_branch_name[0]
+    remote_name = "origin"
+    # Get origin remote
+    origin = repo.remote(remote_name)
+    # Create new branch
+    repo.head.reference = repo.create_head(branch_name)
+    # Create new remote ref and set it to track.
+    rem_ref = RemoteReference(repo, f"refs/remotes/{remote_name}/{branch_name}")
+    repo.head.reference.set_tracking_branch(rem_ref)
     local_branch_names.append(new_branch_name[0])
 
 def deleteSelectedBranch(type: str):
@@ -168,7 +175,7 @@ def pushChanges():
       reapy.show_message_box("Please enter text for commit message", "Commit Failed")
     # Branch is being created, check if user filled in the name and create it
     elif new_branch_name[0] != '':
-      origin.push(refspec=(new_branch_name[0]+':'+new_branch_name[0]))
+      origin.push(new_branch_name[0])
       new_branch_name[0] = ''
       updateBranchList()
     # If no files were changed, we can't do anything
