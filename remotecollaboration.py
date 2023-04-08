@@ -1,7 +1,20 @@
 # This script allows remote collaboration for Reaper projects
 # via GitHub
+
+# Things you need:
+# 1. Update your system to latest software (usually good to do)
+# 2. Update Python (this script uses 3.11.2)
+# 3. Update Reaper (currently using v6.78 macOS-arm64)
+# 4. Update pip (Python package manager) using 'pip3 install --upgrade pip' (currently using 23.0.1)
+# 5. Install required modules below using 'pip3 install <required module>'
+  # - 'pip3 install GitPython'
+  # - 'pip3 install python-reapy'
+# 6. Install ReaPack: https://reapack.com/
+# 7. Install ReaImGui through ReaPack: https://github.com/cfillion/reaimgui
+
 import sys
 sys.path.append(RPR_GetResourcePath() + '/Scripts/ReaTeam Extensions/API')
+
 import imgui_python
 import reapy
 import git
