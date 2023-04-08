@@ -99,7 +99,7 @@ def loop():
 
     renderTextInput('Commit message',commit_message)
     renderTextInput('New branch name',new_branch_name)
-  
+
     if imgui_python.ImGui_Button(ctx, 'Create Branch'):
       createBranch()
 
@@ -117,8 +117,10 @@ def fetchOrigin():
 
 def checkout(branch: str):
   try:
+    # This might fail if the branch is remote
     repo.heads[branch].checkout()
   except:
+    # Branch is remote, add it to local
     ref = origin.refs[str.split(branch,'/')[1]]
     if ref.remote_head not in repo.heads:
       new_head = repo.create_head(ref.remote_head, ref)
