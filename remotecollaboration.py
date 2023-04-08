@@ -72,7 +72,7 @@ def cycleDropdown():
           new_head.set_tracking_branch(ref)
           local_branch_names.append(new_head.name)
         repo.heads[ref.remote_head].checkout()
-        current_local_branch = str.split(branch,'/')[1]
+        current_local_branch[0] = str.split(branch,'/')[1]
         # Open the project for the selected branch
         reapy.open_project(project.path + '/remotecollaboration.rpp')
       if is_selected:
