@@ -109,7 +109,7 @@ def loop():
 def fetchOrigin(debugMode = False):
   ssh_cmd = 'ssh -i id_deployment_key'
   with repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
-    repo.remotes.origin.fetch()
+    origin.update()
 
   if debugMode:
     reapy.print('Successfully fetched:', origin.name)
