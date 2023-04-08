@@ -128,8 +128,9 @@ def loop():
         with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
           if commit_message[0] == '':
             reapy.show_message_box("Please enter text for commit message", "Commit Failed")
-          if new_branch_name[0] != '' and commit_message != '':
+          elif new_branch_name[0] != '':
             origin.push(new_branch_name[0])
+            new_branch_name[0] = ''
           else:
             files = repo.git.diff(None, name_only=True)
             for f in files.split('\n'):
