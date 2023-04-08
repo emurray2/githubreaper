@@ -37,8 +37,9 @@ def init():
   global current_local_branch
   global current_remote_branch
   ctx = imgui_python.ImGui_CreateContext('GitHub Reaper')
-  current_local_branch = ['']
-  current_remote_branch = ['']
+  updateBranchList()
+  current_local_branch = [repo.active_branch]
+  current_remote_branch = [remote_branch_names[0]]
   loop()
 
 # Render cycle for drop-down menu
@@ -82,7 +83,7 @@ def loop():
 
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
-      updateBranchList(debugMode = False)
+      updateBranchList(debugMode)
     cycleDropdown()
     imgui_python.ImGui_End(ctx)
 
