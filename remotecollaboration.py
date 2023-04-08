@@ -99,16 +99,17 @@ def loop():
       repo.delete_head(deleting_head)
       local_branch_names.remove(deleting_head)
     if imgui_python.ImGui_Button(ctx, 'Push Changes'):
-      origin.push()
+        reapy.print('push changes')
+        #repo.remotes.origin.push()
     imgui_python.ImGui_End(ctx)
 
   if open:
     RPR_defer('loop()')
 
 def fetchOrigin(debugMode = False):
-  repo.delete_remote(origin)
-  repo.create_remote('origin','https://github.com/emurray2/reaperfun')
-  origin.fetch()
+  ssh_cmd = 'ssh -i id_deployment_key'
+  with repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
+    repo.remotes.origin.fetch()
 
   if debugMode:
     reapy.print('Successfully fetched:', origin.name)
