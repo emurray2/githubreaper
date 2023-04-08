@@ -98,6 +98,8 @@ def loop():
       reapy.open_project(project.path + '/remotecollaboration.rpp')
       repo.delete_head(deleting_head)
       local_branch_names.remove(deleting_head)
+    if imgui_python.ImGui_Button(ctx, 'Push Changes'):
+      origin.push()
     imgui_python.ImGui_End(ctx)
 
   if open:
