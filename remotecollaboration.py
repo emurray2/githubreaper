@@ -110,7 +110,7 @@ def loop():
           for f in files.split('\n'):
             repo.git.add(f)
           repo.index.commit("test-commit")
-          repo.remotes.origin.push()
+          origin.push()
     imgui_python.ImGui_End(ctx)
 
   if open:
