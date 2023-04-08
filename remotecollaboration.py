@@ -28,10 +28,27 @@ repo = git.Repo(project.path)
 # Get the origin
 origin = repo.remotes.origin
 
+# Keep track of branches
+remote_branch_names = []
+
 def init():
   global ctx
+  global current_branch
   ctx = imgui_python.ImGui_CreateContext('GitHub Reaper')
+  current_branch = ['']
   loop()
+
+# Render cycle for drop-down menu
+def cycleDropdown():
+  if imgui_python.ImGui_BeginCombo(ctx, 'Current Branch', current_branch[0]):
+    for branch in remote_branch_names:
+      is_selected = (current_branch[0] == branch)
+      (begin_select, is_selected) = imgui_python.ImGui_Selectable(ctx, branch, is_selected)
+      if begin_select:
+        current_branch[0] = branch
+      if is_selected:
+        imgui_python.ImGui_SetItemDefaultFocus(ctx)
+    imgui_python.ImGui_EndCombo(ctx)
 
 def loop():
   imgui_python.ImGui_SetNextWindowSize(ctx, 700, 500, imgui_python.ImGui_Cond_FirstUseEver())
@@ -40,7 +57,7 @@ def loop():
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
       updateBranchList(debugMode = False)
-
+    cycleDropdown()
     imgui_python.ImGui_End(ctx)
 
   if open:
@@ -58,9 +75,11 @@ def fetchOrigin(debugMode = False):
     reapy.print('')
 
 def updateBranchList(debugMode = False):
-  remote_branch_names = []
 
   fetchOrigin(debugMode = debugMode)
+
+  # Reset branch list
+  remote_branch_names.clear()
 
   # Add heads from remote
   for ref in origin.refs:
@@ -78,6 +97,7 @@ def updateBranchList(debugMode = False):
     reapy.print('local heads:',repo.heads)
     reapy.print('local refs:',repo.refs)
     reapy.print('remote refs:',origin.refs)
+    reapy.print('remote branches:',remote_branch_names)
     reapy.print('')
 
 RPR_defer('init()')
