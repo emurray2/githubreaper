@@ -45,7 +45,12 @@ def cycleDropdown():
       is_selected = (current_branch[0] == branch)
       (begin_select, is_selected) = imgui_python.ImGui_Selectable(ctx, branch, is_selected)
       if begin_select:
+        # Set the menu binding
         current_branch[0] = branch
+        # Checkout the selected branch
+        repo.heads[branch].checkout()
+        # Open the project for the selected branch
+        reapy.open_project(project.path + '/remotecollaboration.rpp')
       if is_selected:
         imgui_python.ImGui_SetItemDefaultFocus(ctx)
     imgui_python.ImGui_EndCombo(ctx)
@@ -91,6 +96,12 @@ def updateBranchList(debugMode = False):
   # Delete heads not on remote (for the sake of simplicity)
   for head in repo.heads:
     if head.name not in remote_branch_names:
+      # Set menu binding to default branch
+      current_branch[0] = repo.heads[0]
+      # Checkout default branch to avoid errors
+      repo.heads[0].checkout()
+      # Open the project for default branch
+      reapy.open_project(project.path + '/remotecollaboration.rpp')
       repo.delete_head(head.name)
 
   if debugMode:
