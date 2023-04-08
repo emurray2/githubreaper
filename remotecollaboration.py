@@ -37,10 +37,12 @@ def init():
   global ctx
   global current_local_branch
   global current_remote_branch
+  global commit_message
   ctx = imgui_python.ImGui_CreateContext('GitHub Reaper')
   updateBranchList()
   current_local_branch = [repo.active_branch]
   current_remote_branch = [remote_branch_names[0]]
+  commit_message = ['']
   loop()
 
 # Render cycle for drop-down menu
@@ -99,6 +101,11 @@ def loop():
       reapy.open_project(project.path + '/remotecollaboration.rpp')
       repo.delete_head(deleting_head)
       local_branch_names.remove(deleting_head)
+
+    (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message:', commit_message[0])
+    if show_textinput:
+      commit_message[0] = message
+
     if imgui_python.ImGui_Button(ctx, 'Push Changes'):
         # You'll need to configure your own SSH key to write to your repo
         # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
@@ -109,7 +116,7 @@ def loop():
           files = repo.git.diff(None, name_only=True)
           for f in files.split('\n'):
             repo.git.add(f)
-          repo.index.commit("test-commit")
+          repo.index.commit(commit_message[0])
           origin.push()
     imgui_python.ImGui_End(ctx)
 
