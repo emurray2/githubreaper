@@ -127,11 +127,13 @@ def updateBranchList(debugMode = False):
 
   # Get local branch list
   for head in repo.heads:
-    local_branch_names.append(head.name)
+    if head.name != 'HEAD':
+      local_branch_names.append(head.name)
 
   # Get remote branch list
   for ref in origin.refs:
-    remote_branch_names.append(ref.name)
+    if ref.name != origin.name+'HEAD':
+      remote_branch_names.append(ref.name)
 
   if debugMode:
     reapy.print('local heads:',repo.heads)
