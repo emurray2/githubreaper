@@ -11,6 +11,9 @@
   # - 'pip3 install python-reapy'
 # 6. Install ReaPack: https://reapack.com/ (currently using v1.2.4.3 macOS arm64)
 # 7. Install ReaImGui through ReaPack: https://github.com/cfillion/reaimgui (currently using 0.8.5)
+# 8. You'll need to configure your own SSH key to write to your repo
+  # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+  # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
 
 import sys
 import os
@@ -25,6 +28,10 @@ project = reapy.Project('remotecollaboration')
 
 # Find the Git repo inside the working directory (same as project path)
 repo = git.Repo(project.path)
+
+# Get the SSH key info
+git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
+git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
 
 # Get the origin
 origin = repo.remotes.origin
@@ -111,9 +118,6 @@ def loop():
       current_remote_branch[0] = repo.heads[0]
       # Checkout default branch to avoid errors
       repo.heads.main.checkout()
-      # You'll need to configure your own SSH key to write to your repo
-      # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
-      # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
       git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
       git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
       files = repo.git.diff(None, name_only=True)
@@ -137,9 +141,6 @@ def loop():
         local_branch_names.append(new_branch_name[0])
 
     if imgui_python.ImGui_Button(ctx, 'Push Changes'):
-        # You'll need to configure your own SSH key to write to your repo
-        # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
-        # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
         git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
         git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
         files = repo.git.diff(None, name_only=True)
@@ -164,11 +165,6 @@ def loop():
     RPR_defer('loop()')
 
 def fetchOrigin(debugMode = False):
-  # You'll need to configure your own SSH key to write to your repo
-  # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
-  # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
-  git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
-  git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
   with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
     origin.update()
 
