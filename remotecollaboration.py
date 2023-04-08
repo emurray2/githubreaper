@@ -55,36 +55,16 @@ def init():
   loop()
 
 # Render cycle for drop-down menu
-def cycleDropdown():
-  if imgui_python.ImGui_BeginCombo(ctx, 'Local Branches', current_local_branch[0]):
-    for branch in local_branch_names:
-      is_selected = (current_local_branch[0] == branch)
+def renderDropdown(name: str, binding, branches):
+  if imgui_python.ImGui_BeginCombo(ctx, name, binding[0]):
+    for branch in branches:
+      is_selected = (binding[0] == branch)
       (begin_select, is_selected) = imgui_python.ImGui_Selectable(ctx, branch, is_selected)
       if begin_select:
         # Set the menu binding
-        current_local_branch[0] = branch
+        binding[0] = branch
         # Checkout the selected branch
-        repo.heads[branch].checkout()
-        # Open the project for the selected branch
-        reapy.open_project(project.path + '/remotecollaboration.rpp')
-      if is_selected:
-        imgui_python.ImGui_SetItemDefaultFocus(ctx)
-    imgui_python.ImGui_EndCombo(ctx)
-  if imgui_python.ImGui_BeginCombo(ctx, 'Remote Branches', current_remote_branch[0]):
-    for branch in remote_branch_names:
-      is_selected = (current_remote_branch[0] == branch)
-      (begin_select, is_selected) = imgui_python.ImGui_Selectable(ctx, branch, is_selected)
-      if begin_select:
-        # Set the menu binding
-        current_remote_branch[0] = branch
-        # Check if ref exists in local
-        ref = origin.refs[str.split(branch,'/')[1]]
-        if ref.remote_head not in repo.heads:
-          new_head = repo.create_head(ref.remote_head, ref)
-          new_head.set_tracking_branch(ref)
-          local_branch_names.append(new_head.name)
-        repo.heads[ref.remote_head].checkout()
-        current_local_branch[0] = str.split(branch,'/')[1]
+        checkout(branch)
         # Open the project for the selected branch
         reapy.open_project(project.path + '/remotecollaboration.rpp')
       if is_selected:
@@ -98,7 +78,8 @@ def loop():
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
       updateBranchList()
-    cycleDropdown()
+    renderDropdown('Local Branches', current_local_branch, local_branch_names)
+    renderDropdown('Remote Branches', current_remote_branch, remote_branch_names)
     if imgui_python.ImGui_Button(ctx, 'Delete Selected Local Branch'):
       # Store menu binding for deletion
       deleting_head = current_local_branch[0]
@@ -174,8 +155,19 @@ def fetchOrigin(debugMode = False):
     reapy.print('branches:',origin.refs)
     reapy.print('')
 
-def updateBranchList(debugMode = False):
+def checkout(branch: str):
+  try:
+    repo.heads[branch].checkout()
+  except:
+    ref = origin.refs[str.split(branch,'/')[1]]
+    if ref.remote_head not in repo.heads:
+      new_head = repo.create_head(ref.remote_head, ref)
+      new_head.set_tracking_branch(ref)
+      local_branch_names.append(new_head.name)
+    repo.heads[ref.remote_head].checkout()
+    current_local_branch[0] = str.split(branch,'/')[1]
 
+def updateBranchList(debugMode = False):
   fetchOrigin(debugMode = debugMode)
 
   # Reset branch list
