@@ -88,6 +88,7 @@ def loop():
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
       updateBranchList()
+      reapy.show_message_box('Successfully fetched origin.','Fetch Success')
 
     renderDropdown('Local Branches', current_local_branch, local_branch_names)
     renderDropdown('Remote Branches', current_remote_branch, remote_branch_names)
@@ -144,6 +145,7 @@ def createBranch():
     rem_ref = git.RemoteReference(repo, f"refs/remotes/{remote_name}/{branch_name}")
     repo.head.reference.set_tracking_branch(rem_ref)
     local_branch_names.append(new_branch_name[0])
+    reapy.show_message_box('Branch created: '+new_branch_name[0],'Branch Created')
 
 def deleteSelectedBranch(type: str):
   # Checkout default branch to avoid errors
@@ -153,6 +155,7 @@ def deleteSelectedBranch(type: str):
     deleting_head = current_local_branch[0]
     repo.delete_head(deleting_head)
     local_branch_names.remove(deleting_head)
+    reapy.show_message_box('Local branch deleted: '+deleting_head,'Branch Deleted')
   if type == 'remote':
     # Store menu binding for deletion
     deleting_branch = str.split(current_remote_branch[0],'/')[1]
@@ -165,11 +168,11 @@ def deleteSelectedBranch(type: str):
       local_branch_names.remove(deleting_branch)
     with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
       origin.push(refspec=(":%s" % deleting_branch))
+      reapy.show_message_box('Remote branch deleted: '+deleting_branch,'Branch Deleted')
   # Store name for success message
   name = current_local_branch[0]
   # Set menu binding to default branch
   current_local_branch[0] = repo.active_branch
-  reapy.show_message_box('Branch deleted: '+name,'Branch Deleted')
   # Open the project for default branch
   reapy.open_project(project.path + '/remotecollaboration.rpp')
   updateBranchList()
@@ -184,14 +187,14 @@ def pushChanges():
     # Branch is being created, check if user filled in the name and create it
     elif new_branch_name[0] != '' and new_branch_name[0] in local_branch_names:
       origin.push(new_branch_name[0])
-      reapy.show_message_box('Branch created: '+new_branch_name[0],'Branch Created')
+      reapy.show_message_box('Branch added to upstream: '+new_branch_name[0],'Branch Upstream')
       new_branch_name[0] = ''
       updateBranchList()
     # If no files were changed, we can't do anything
     elif len(files) == 0:
       reapy.show_message_box('No files have changed.', 'Commit Failed')
     # Some files were changed as in a typical git commit, let's add those changes to remote
-    else:
+    elif new_branch_name[0] == '' and commit_message != '':
       for f in files.split('\n'):
         repo.git.add(f)
       repo.index.commit(commit_message[0])
