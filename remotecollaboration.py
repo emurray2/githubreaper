@@ -111,15 +111,9 @@ def loop():
   if open:
     RPR_defer('loop()')
 
-def fetchOrigin(debugMode = False):
+def fetchOrigin():
   with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
     origin.update()
-
-  if debugMode:
-    reapy.print('Successfully fetched:', origin.name)
-    reapy.print('at:',origin.url)
-    reapy.print('branches:',origin.refs)
-    reapy.print('')
 
 def checkout(branch: str):
   try:
@@ -185,8 +179,8 @@ def pushChanges():
       origin.push()
       updateBranchList()
 
-def updateBranchList(debugMode = False):
-  fetchOrigin(debugMode = debugMode)
+def updateBranchList():
+  fetchOrigin()
 
   # Reset branch list
   local_branch_names.clear()
@@ -201,13 +195,5 @@ def updateBranchList(debugMode = False):
   for ref in origin.refs:
     if ref.name != origin.name+'/'+'HEAD':
       remote_branch_names.append(ref.name)
-
-  if debugMode:
-    reapy.print('local heads:',repo.heads)
-    reapy.print('local refs:',repo.refs)
-    reapy.print('remote refs:',origin.refs)
-    reapy.print('local branches:',local_branch_names)
-    reapy.print('remote branches:',remote_branch_names)
-    reapy.print('')
 
 RPR_defer('init()')
