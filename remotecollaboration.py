@@ -106,7 +106,11 @@ def loop():
         git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
         git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
         with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-          origin.push()
+          files = repo.git.diff(None, name_only=True)
+          for f in files.split('\n'):
+            repo.git.add(f)
+          repo.index.commit("test-commit")
+          repo.remotes.origin.push()
     imgui_python.ImGui_End(ctx)
 
   if open:
