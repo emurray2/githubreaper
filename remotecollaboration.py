@@ -132,7 +132,7 @@ def updateBranchList(debugMode = False):
 
   # Get remote branch list
   for ref in origin.refs:
-    if ref.name != origin.name+'HEAD':
+    if ref.name != origin.name+'/'+'HEAD':
       remote_branch_names.append(ref.name)
 
   if debugMode:
