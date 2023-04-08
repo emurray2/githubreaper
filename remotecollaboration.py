@@ -114,6 +114,7 @@ def loop():
 def fetchOrigin():
   with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
     origin.update()
+    origin.fetch
 
 def checkout(branch: str):
   try:
@@ -136,7 +137,6 @@ def createBranch():
     new_branch = repo.create_head(new_branch_name[0])
     new_branch.checkout()
     local_branch_names.append(new_branch_name[0])
-    pushChanges()
 
 def deleteSelectedBranch(type: str):
   # Checkout default branch to avoid errors
@@ -168,7 +168,7 @@ def pushChanges():
       reapy.show_message_box("Please enter text for commit message", "Commit Failed")
     # Branch is being created, check if user filled in the name and create it
     elif new_branch_name[0] != '':
-      origin.push(new_branch_name[0])
+      origin.push(refspec=(new_branch_name[0]+':'+new_branch_name[0]))
       new_branch_name[0] = ''
       updateBranchList()
     # If no files were changed, we can't do anything
