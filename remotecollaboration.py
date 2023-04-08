@@ -9,8 +9,8 @@
 # 5. Install required modules below using 'pip3 install <required module>'
   # - 'pip3 install GitPython'
   # - 'pip3 install python-reapy'
-# 6. Install ReaPack: https://reapack.com/
-# 7. Install ReaImGui through ReaPack: https://github.com/cfillion/reaimgui
+# 6. Install ReaPack: https://reapack.com/ (currently using v1.2.4.3 macOS arm64)
+# 7. Install ReaImGui through ReaPack: https://github.com/cfillion/reaimgui (currently using 0.8.5)
 
 import sys
 sys.path.append(RPR_GetResourcePath() + '/Scripts/ReaTeam Extensions/API')
