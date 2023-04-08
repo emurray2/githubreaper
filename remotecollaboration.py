@@ -184,7 +184,7 @@ def pushChanges():
     # Branch is being created, check if user filled in the name and create it
     elif new_branch_name[0] != '' and new_branch_name[0] in local_branch_names:
       origin.push(new_branch_name[0])
-      reapy.show_console_message('Branch created: '+new_branch_name[0],'Branch Created')
+      reapy.show_message_box('Branch created: '+new_branch_name[0],'Branch Created')
       new_branch_name[0] = ''
       updateBranchList()
     # If no files were changed, we can't do anything
@@ -196,7 +196,7 @@ def pushChanges():
         repo.git.add(f)
       repo.index.commit(commit_message[0])
       origin.push()
-      reapy.show_console_message('Commit successful: '+commit_message[0],'Commit Success')
+      reapy.show_message_box('Commit successful: '+commit_message[0],'Commit Success')
       updateBranchList()
 
 def updateBranchList():
