@@ -136,6 +136,7 @@ def createBranch():
     new_branch = repo.create_head(new_branch_name[0])
     new_branch.checkout()
     local_branch_names.append(new_branch_name[0])
+    pushChanges()
 
 def deleteSelectedBranch(type: str):
   # Checkout default branch to avoid errors
