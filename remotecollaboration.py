@@ -132,7 +132,7 @@ def checkout(branch: str):
 
 def createBranch():
   if new_branch_name[0] == '':
-    reapy.show_message_box("Please enter a name for the new branch.", "Branch Name Empty")
+    reapy.show_message_box('Please enter a name for the new branch.', 'Branch Name Empty')
   else:
     branch_name = new_branch_name[0]
     remote_name = "origin"
@@ -165,9 +165,11 @@ def deleteSelectedBranch(type: str):
       local_branch_names.remove(deleting_branch)
     with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
       origin.push(refspec=(":%s" % deleting_branch))
-
+  # Store name for success message
+  name = current_local_branch[0]
   # Set menu binding to default branch
   current_local_branch[0] = repo.active_branch
+  reapy.show_message_box('Branch deleted: '+name,'Branch Deleted')
   # Open the project for default branch
   reapy.open_project(project.path + '/remotecollaboration.rpp')
   updateBranchList()
@@ -178,21 +180,23 @@ def pushChanges():
   with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
     # Check if commit message is empty and branch name is empty (otherwise user is creating a branch and not a commit)
     if commit_message[0] == '' and new_branch_name[0] == '':
-      reapy.show_message_box("Please enter text for commit message", "Commit Failed")
+      reapy.show_message_box('Please enter text for commit message', 'Commit Failed')
     # Branch is being created, check if user filled in the name and create it
     elif new_branch_name[0] != '' and new_branch_name[0] in local_branch_names:
       origin.push(new_branch_name[0])
+      reapy.show_console_message('Branch created: '+new_branch_name[0],'Branch Created')
       new_branch_name[0] = ''
       updateBranchList()
     # If no files were changed, we can't do anything
     elif len(files) == 0:
-      reapy.show_message_box("No files have changed.", "Commit Failed")
+      reapy.show_message_box('No files have changed.', 'Commit Failed')
     # Some files were changed as in a typical git commit, let's add those changes to remote
     else:
       for f in files.split('\n'):
         repo.git.add(f)
       repo.index.commit(commit_message[0])
       origin.push()
+      reapy.show_console_message('Commit successful: '+commit_message[0],'Commit Success')
       updateBranchList()
 
 def updateBranchList():
