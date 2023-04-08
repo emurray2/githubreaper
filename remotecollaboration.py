@@ -99,9 +99,6 @@ def loop():
       current_remote_branch[0] = repo.heads[0]
       # Checkout default branch to avoid errors
       repo.heads.main.checkout()
-      git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
-      git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
-      files = repo.git.diff(None, name_only=True)
       with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
         origin.push(refspec=(":%s" % deleting_branch))
         updateBranchList()
