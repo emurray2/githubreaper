@@ -102,7 +102,7 @@ def loop():
       repo.delete_head(deleting_head)
       local_branch_names.remove(deleting_head)
 
-    (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message:', commit_message[0])
+    (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message', commit_message[0])
     if show_textinput:
       commit_message[0] = message
 
@@ -113,11 +113,14 @@ def loop():
         git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
         git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
         with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-          files = repo.git.diff(None, name_only=True)
-          for f in files.split('\n'):
-            repo.git.add(f)
-          repo.index.commit(commit_message[0])
-          origin.push()
+          if commit_message[0] == '':
+            reapy.show_message_box("Please enter text for commit message", "Commit Failed")
+          else:
+            files = repo.git.diff(None, name_only=True)
+            for f in files.split('\n'):
+              repo.git.add(f)
+            repo.index.commit(commit_message[0])
+            origin.push()
     imgui_python.ImGui_End(ctx)
 
   if open:
