@@ -81,27 +81,9 @@ def loop():
     renderDropdown('Local Branches', current_local_branch, local_branch_names)
     renderDropdown('Remote Branches', current_remote_branch, remote_branch_names)
     if imgui_python.ImGui_Button(ctx, 'Delete Selected Local Branch'):
-      # Store menu binding for deletion
-      deleting_head = current_local_branch[0]
-      # Set menu binding to default branch
-      current_local_branch[0] = repo.heads[0]
-      # Checkout default branch to avoid errors
-      repo.heads.main.checkout()
-      # Open the project for default branch
-      reapy.open_project(project.path + '/remotecollaboration.rpp')
-      repo.delete_head(deleting_head)
-      local_branch_names.remove(deleting_head)
+      deleteSelectedBranch()
     if imgui_python.ImGui_Button(ctx, 'Delete Selected Remote Branch'):
-      # Store menu binding for deletion
-      deleting_branch = str.split(current_remote_branch[0],'/')[1]
-      # Set menu binding to default branch
-      current_local_branch[0] = repo.heads[0]
-      current_remote_branch[0] = repo.heads[0]
-      # Checkout default branch to avoid errors
-      repo.heads.main.checkout()
-      with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-        origin.push(refspec=(":%s" % deleting_branch))
-        updateBranchList()
+      deleteSelectedBranch()
 
     (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message', commit_message[0])
     if show_textinput:
@@ -163,6 +145,28 @@ def checkout(branch: str):
       local_branch_names.append(new_head.name)
     repo.heads[ref.remote_head].checkout()
     current_local_branch[0] = str.split(branch,'/')[1]
+
+def deleteSelectedBranch():
+  # Checkout default branch to avoid errors
+  repo.heads.main.checkout()
+  try:
+    # Store menu binding for deletion
+    deleting_head = current_local_branch[0]
+    repo.delete_head(deleting_head)
+    local_branch_names.remove(deleting_head)
+  except:
+    # Store menu binding for deletion
+    deleting_branch = str.split(current_remote_branch[0],'/')[1]
+    # Set menu binding to default branch
+    current_remote_branch[0] = origin.refs.main.name
+    with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
+        origin.push(refspec=(":%s" % deleting_branch))
+        updateBranchList()
+  # Set menu binding to default branch
+  current_local_branch[0] = repo.active_branch
+  # Open the project for default branch
+  reapy.open_project(project.path + '/remotecollaboration.rpp')
+
 
 def updateBranchList(debugMode = False):
   fetchOrigin(debugMode = debugMode)
