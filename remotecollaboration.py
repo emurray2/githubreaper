@@ -103,6 +103,22 @@ def loop():
       reapy.open_project(project.path + '/remotecollaboration.rpp')
       repo.delete_head(deleting_head)
       local_branch_names.remove(deleting_head)
+    if imgui_python.ImGui_Button(ctx, 'Delete Selected Remote Branch'):
+      # Store menu binding for deletion
+      deleting_branch = str.split(current_remote_branch[0],'/')[1]
+      # Set menu binding to default branch
+      current_local_branch[0] = repo.heads[0]
+      current_remote_branch[0] = repo.heads[0]
+      # Checkout default branch to avoid errors
+      repo.heads.main.checkout()
+      # You'll need to configure your own SSH key to write to your repo
+      # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+      # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
+      git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
+      git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
+      files = repo.git.diff(None, name_only=True)
+      with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
+        origin.push(refspec=(":%s" % deleting_branch))
 
     (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message', commit_message[0])
     if show_textinput:
