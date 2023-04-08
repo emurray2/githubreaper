@@ -160,6 +160,9 @@ def deleteSelectedBranch(type: str):
     # Set menu binding to default branch
     current_remote_branch[0] = origin.refs.main.name
     with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
+      # Delete local stuff too
+      repo.delete_head(deleting_head)
+      local_branch_names.remove(deleting_head)
       origin.push(refspec=(":%s" % deleting_branch))
       updateBranchList()
   # Set menu binding to default branch
