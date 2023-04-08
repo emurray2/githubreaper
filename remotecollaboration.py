@@ -71,6 +71,12 @@ def renderDropdown(name: str, binding, branches):
         imgui_python.ImGui_SetItemDefaultFocus(ctx)
     imgui_python.ImGui_EndCombo(ctx)
 
+# Render cycle for text input
+def renderTextInput(name: str, binding):
+  (show_textinput, message) = imgui_python.ImGui_InputText(ctx, name, binding[0])
+  if show_textinput:
+    binding[0] = message
+
 def loop():
   imgui_python.ImGui_SetNextWindowSize(ctx, 700, 500, imgui_python.ImGui_Cond_FirstUseEver())
   visible, open = imgui_python.ImGui_Begin(ctx, 'GitHub Reaper', True)
@@ -78,20 +84,18 @@ def loop():
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
       updateBranchList()
+
     renderDropdown('Local Branches', current_local_branch, local_branch_names)
     renderDropdown('Remote Branches', current_remote_branch, remote_branch_names)
+
     if imgui_python.ImGui_Button(ctx, 'Delete Selected Local Branch'):
       deleteSelectedBranch('local')
     if imgui_python.ImGui_Button(ctx, 'Delete Selected Remote Branch'):
       deleteSelectedBranch('remote')
 
-    (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message', commit_message[0])
-    if show_textinput:
-      commit_message[0] = message
-    (create_new_branch_name, branch_name) = imgui_python.ImGui_InputText(ctx, 'New branch name', new_branch_name[0])
-    if create_new_branch_name:
-      new_branch_name[0] = branch_name
-
+    renderTextInput('Commit message',commit_message)
+    renderTextInput('New branch name',new_branch_name)
+  
     if imgui_python.ImGui_Button(ctx, 'Create Branch'):
       if new_branch_name[0] == '':
         reapy.show_message_box("Please enter a name for the new branch.", "Branch Name Empty")
