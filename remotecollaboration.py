@@ -153,6 +153,7 @@ def deleteSelectedBranch(type: str):
     deleting_head = current_local_branch[0]
     repo.delete_head(deleting_head)
     local_branch_names.remove(deleting_head)
+    updateBranchList()
   if type == 'remote':
     # Store menu binding for deletion
     deleting_branch = str.split(current_remote_branch[0],'/')[1]
