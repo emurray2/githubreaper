@@ -38,11 +38,13 @@ def init():
   global current_local_branch
   global current_remote_branch
   global commit_message
+  global new_branch_name
   ctx = imgui_python.ImGui_CreateContext('GitHub Reaper')
   updateBranchList()
   current_local_branch = [repo.active_branch]
   current_remote_branch = [remote_branch_names[0]]
   commit_message = ['']
+  new_branch_name = ['']
   loop()
 
 # Render cycle for drop-down menu
@@ -96,7 +98,7 @@ def loop():
       # Set menu binding to default branch
       current_local_branch[0] = repo.heads[0]
       # Checkout default branch to avoid errors
-      repo.heads[0].checkout()
+      repo.heads.main.checkout()
       # Open the project for default branch
       reapy.open_project(project.path + '/remotecollaboration.rpp')
       repo.delete_head(deleting_head)
@@ -105,6 +107,17 @@ def loop():
     (show_textinput, message) = imgui_python.ImGui_InputText(ctx, 'Commit message', commit_message[0])
     if show_textinput:
       commit_message[0] = message
+    (create_new_branch_name, branch_name) = imgui_python.ImGui_InputText(ctx, 'New branch name', new_branch_name[0])
+    if create_new_branch_name:
+      new_branch_name[0] = branch_name
+
+    if imgui_python.ImGui_Button(ctx, 'Create Branch'):
+      if new_branch_name[0] == '':
+        reapy.show_message_box("Please enter a name for the new branch.", "Branch Name Empty")
+      else:
+        new_branch = repo.create_head(new_branch_name[0])
+        new_branch.checkout()
+        local_branch_names.append(new_branch_name[0])
 
     if imgui_python.ImGui_Button(ctx, 'Push Changes'):
         # You'll need to configure your own SSH key to write to your repo
@@ -115,6 +128,12 @@ def loop():
         with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
           if commit_message[0] == '':
             reapy.show_message_box("Please enter text for commit message", "Commit Failed")
+          if new_branch_name[0] != '' and commit_message != '':
+            files = repo.git.diff(None, name_only=True)
+            for f in files.split('\n'):
+              repo.git.add(f)
+            repo.index.commit(commit_message[0])
+            origin.push(new_branch_name[0])
           else:
             files = repo.git.diff(None, name_only=True)
             for f in files.split('\n'):
