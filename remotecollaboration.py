@@ -100,20 +100,26 @@ def loop():
       repo.delete_head(deleting_head)
       local_branch_names.remove(deleting_head)
     if imgui_python.ImGui_Button(ctx, 'Push Changes'):
-        reapy.print('push changes')
-        #repo.remotes.origin.push()
+        # You'll need to configure your own SSH key to write to your repo
+        # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+        # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
+        git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
+        git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
+        with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
+          origin.push()
     imgui_python.ImGui_End(ctx)
 
   if open:
     RPR_defer('loop()')
 
 def fetchOrigin(debugMode = False):
+  # You'll need to configure your own SSH key to write to your repo
+  # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+  # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
   git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
   git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
   with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
-    origin.fetch()
     origin.update()
-    origin.push()
 
   if debugMode:
     reapy.print('Successfully fetched:', origin.name)
