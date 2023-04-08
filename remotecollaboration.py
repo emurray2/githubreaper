@@ -29,26 +29,47 @@ repo = git.Repo(project.path)
 origin = repo.remotes.origin
 
 # Keep track of branches
+local_branch_names = []
 remote_branch_names = []
 
 def init():
   global ctx
-  global current_branch
+  global current_local_branch
+  global current_remote_branch
   ctx = imgui_python.ImGui_CreateContext('GitHub Reaper')
-  current_branch = ['']
+  current_local_branch = ['']
+  current_remote_branch = ['']
   loop()
 
 # Render cycle for drop-down menu
 def cycleDropdown():
-  if imgui_python.ImGui_BeginCombo(ctx, 'Current Branch', current_branch[0]):
-    for branch in remote_branch_names:
-      is_selected = (current_branch[0] == branch)
+  if imgui_python.ImGui_BeginCombo(ctx, 'Local Branches', current_local_branch[0]):
+    for branch in local_branch_names:
+      is_selected = (current_local_branch[0] == branch)
       (begin_select, is_selected) = imgui_python.ImGui_Selectable(ctx, branch, is_selected)
       if begin_select:
         # Set the menu binding
-        current_branch[0] = branch
+        current_local_branch[0] = branch
         # Checkout the selected branch
         repo.heads[branch].checkout()
+        # Open the project for the selected branch
+        reapy.open_project(project.path + '/remotecollaboration.rpp')
+      if is_selected:
+        imgui_python.ImGui_SetItemDefaultFocus(ctx)
+    imgui_python.ImGui_EndCombo(ctx)
+  if imgui_python.ImGui_BeginCombo(ctx, 'Remote Branches', current_remote_branch[0]):
+    for branch in remote_branch_names:
+      is_selected = (current_remote_branch[0] == branch)
+      (begin_select, is_selected) = imgui_python.ImGui_Selectable(ctx, branch, is_selected)
+      if begin_select:
+        # Set the menu binding
+        current_remote_branch[0] = branch
+        # Check if ref exists in local
+        ref = origin.refs[str.split(branch,'/')[1]]
+        if ref.remote_head not in repo.heads:
+          new_head = repo.create_head(ref.remote_head, ref)
+          new_head.set_tracking_branch(ref)
+        repo.heads[ref.remote_head].checkout()
         # Open the project for the selected branch
         reapy.open_project(project.path + '/remotecollaboration.rpp')
       if is_selected:
@@ -84,30 +105,22 @@ def updateBranchList(debugMode = False):
   fetchOrigin(debugMode = debugMode)
 
   # Reset branch list
+  local_branch_names.clear()
   remote_branch_names.clear()
 
-  # Add heads from remote
-  for ref in origin.refs:
-    remote_branch_names.append(ref.remote_head)
-    if ref.remote_head not in repo.heads:
-      new_head = repo.create_head(ref.remote_head, ref)
-      new_head.set_tracking_branch(ref)
-
-  # Delete heads not on remote (for the sake of simplicity)
+  # Get local branch list
   for head in repo.heads:
-    if head.name not in remote_branch_names:
-      # Set menu binding to default branch
-      current_branch[0] = repo.heads[0]
-      # Checkout default branch to avoid errors
-      repo.heads[0].checkout()
-      # Open the project for default branch
-      reapy.open_project(project.path + '/remotecollaboration.rpp')
-      repo.delete_head(head.name)
+    local_branch_names.append(head.name)
+
+  # Get remote branch list
+  for ref in origin.refs:
+    remote_branch_names.append(ref.name)
 
   if debugMode:
     reapy.print('local heads:',repo.heads)
     reapy.print('local refs:',repo.refs)
     reapy.print('remote refs:',origin.refs)
+    reapy.print('local branches:',local_branch_names)
     reapy.print('remote branches:',remote_branch_names)
     reapy.print('')
 
