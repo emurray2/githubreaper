@@ -26,7 +26,7 @@ def loop():
 
   if visible:
     if imgui_python.ImGui_Button(ctx, 'Fetch Origin'):
-      fetchOrigin()
+      updateBranchList(debugMode = False)
 
     imgui_python.ImGui_End(ctx)
 
@@ -34,8 +34,37 @@ def loop():
     RPR_defer('loop()')
 
 def fetchOrigin(debugMode = False):
+  repo.delete_remote(origin)
+  repo.create_remote('origin','https://github.com/emurray2/reaperfun')
   origin.fetch()
+
   if debugMode:
-    reapy.print('Successfully fetched:', origin.name,'at:',origin.url,'branches:',origin.refs)
+    reapy.print('Successfully fetched:', origin.name)
+    reapy.print('at:',origin.url)
+    reapy.print('branches:',origin.refs)
+    reapy.print('')
+
+def updateBranchList(debugMode = False):
+  remote_branch_names = []
+
+  fetchOrigin(debugMode = debugMode)
+
+  # Add heads from remote
+  for ref in origin.refs:
+    remote_branch_names.append(ref.remote_head)
+    if ref.remote_head not in repo.heads:
+      new_head = repo.create_head(ref.remote_head, ref)
+      new_head.set_tracking_branch(ref)
+
+  # Delete heads not on remote (for the sake of simplicity)
+  for head in repo.heads:
+    if head.name not in remote_branch_names:
+      repo.delete_head(head.name)
+
+  if debugMode:
+    reapy.print('local heads:',repo.heads)
+    reapy.print('local refs:',repo.refs)
+    reapy.print('remote refs:',origin.refs)
+    reapy.print('')
 
 RPR_defer('init()')
