@@ -132,8 +132,9 @@ def loop():
           elif new_branch_name[0] != '':
             origin.push(new_branch_name[0])
             new_branch_name[0] = ''
+          elif len(files) == 0:
+            reapy.show_message_box("No files have changed.", "Commit Failed")
           else:
-            reapy.print(files)
             for f in files.split('\n'):
               repo.git.add(f)
             repo.index.commit(commit_message[0])
