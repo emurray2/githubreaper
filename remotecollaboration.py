@@ -175,7 +175,7 @@ def pushChanges():
     if commit_message[0] == '' and new_branch_name[0] == '':
       reapy.show_message_box("Please enter text for commit message", "Commit Failed")
     # Branch is being created, check if user filled in the name and create it
-    elif new_branch_name[0] != '':
+    elif new_branch_name[0] != '' and new_branch_name[0] in local_branch_names:
       origin.push(new_branch_name[0])
       new_branch_name[0] = ''
       updateBranchList()
