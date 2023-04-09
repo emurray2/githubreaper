@@ -14,6 +14,9 @@
 # 8. You'll need to configure your own SSH key to write to your repo
   # See: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
   # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
+# 9. Add this Python script to Reaper using the 'Actions' menu
+# 10. Replace project and repo details below with your repo and project
+# 11. Run the script
 
 import sys
 import os
@@ -24,17 +27,17 @@ import reapy
 import git
 
 # Find the Reaper project inside this repo
+# Replace this with the reaper project name you wish to use
 project = reapy.Project('remotecollaboration')
-
 # Find the Git repo inside the working directory (same as project path)
 repo = git.Repo(project.path)
-
-# Get the SSH key info
+# Get the SSH key info (setup on your system)
 git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
 git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
-
 # Get the origin
-origin = repo.remotes.origin
+# Switch to url of the repo you wish to use
+repo_url = 'git@github.com:emurray2/reapergithub.git'
+origin = repo.create_remote('origin', repo_url)
 
 # Keep track of branches
 local_branch_names = []
