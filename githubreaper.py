@@ -74,7 +74,7 @@ def renderDropdown(name: str, binding, branches):
         # Checkout the selected branch
         checkout(branch)
         # Open the project for the selected branch
-        reapy.open_project(project.path + '/remotecollaboration.rpp')
+        reapy.open_project(project.path + '/githubreaper.rpp')
       if is_selected:
         imgui_python.ImGui_SetItemDefaultFocus(ctx)
     imgui_python.ImGui_EndCombo(ctx)
@@ -178,7 +178,7 @@ def deleteSelectedBranch(type: str):
   # Set menu binding to default branch
   current_local_branch[0] = repo.active_branch
   # Open the project for default branch
-  reapy.open_project(project.path + '/remotecollaboration.rpp')
+  reapy.open_project(project.path + '/githubreaper.rpp')
   updateBranchList()
 
 def pushChanges():
