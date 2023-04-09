@@ -34,7 +34,8 @@ repo = git.Repo(project.path)
 # Get the SSH key info (setup on your system)
 git_ssh_identity_file = os.path.expanduser('~/.ssh/id_ed25519')
 git_ssh_cmd = 'ssh -i %s' % git_ssh_identity_file
-# Get the origin url
+# Get the origin
+origin = repo.remotes.origin
 # Switch to url of the repo you wish to use
 repo_url = 'git@github.com:emurray2/reapergithub.git'
 origin.set_url(repo_url)
