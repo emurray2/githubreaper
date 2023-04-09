@@ -1,6 +1,8 @@
 # githubreaper
 - A senior capstone project I'm working on with some classmates in school. More details coming soon 👀!
 
+![Commit](/screenshots/commit.png)
+
 ## Overview
 - The contents within this repo allows the Digital Audio Workstation, Reaper, to behave like GitHub.
 - Think of it as "version control at a musician's fingertips... Or keys 🎹."
