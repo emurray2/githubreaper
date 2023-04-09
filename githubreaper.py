@@ -28,7 +28,8 @@ import git
 
 # Find the Reaper project inside this repo
 # Replace this with the reaper project name you wish to use
-project = reapy.Project('githubreaper')
+project_name = 'githubreaper'
+project = reapy.Project(project_name)
 # Find the Git repo inside the working directory (same as project path)
 repo = git.Repo(project.path)
 # Get the SSH key info (setup on your system)
@@ -74,7 +75,7 @@ def renderDropdown(name: str, binding, branches):
         # Checkout the selected branch
         checkout(branch)
         # Open the project for the selected branch
-        reapy.open_project(project.path + '/githubreaper.rpp')
+        reapy.open_project(project.path + '/'+project_name+'.rpp')
       if is_selected:
         imgui_python.ImGui_SetItemDefaultFocus(ctx)
     imgui_python.ImGui_EndCombo(ctx)
@@ -178,7 +179,7 @@ def deleteSelectedBranch(type: str):
   # Set menu binding to default branch
   current_local_branch[0] = repo.active_branch
   # Open the project for default branch
-  reapy.open_project(project.path + '/githubreaper.rpp')
+  reapy.open_project(project.path + '/'+project_name+'.rpp')
   updateBranchList()
 
 def pushChanges():
