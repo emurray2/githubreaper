@@ -28,7 +28,7 @@ import git
 
 # Find the Reaper project inside this repo
 # Replace this with the reaper project name you wish to use
-project = reapy.Project('remotecollaboration')
+project = reapy.Project('githubreaper')
 # Find the Git repo inside the working directory (same as project path)
 repo = git.Repo(project.path)
 # Get the SSH key info (setup on your system)
