@@ -16,7 +16,7 @@
   # See: https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories#switching-remote-urls-from-https-to-ssh
 # 9. Add this Python script to Reaper using the 'Actions' menu
 # 10. Replace project and repo details below with your repo and project
-# 11. Run the script
+# 11. Run the script (inside reaper 'Actions' menu with the project open--don't use terminal)
 
 import sys
 import os
