@@ -141,7 +141,7 @@ def loop():
 def fetchOrigin():
   with repo.git.custom_environment(GIT_SSH_COMMAND=git_ssh_cmd):
     origin.update()
-    origin.fetch
+    origin.fetch()
 
 def checkout(branch: str):
   try:
