@@ -19,4 +19,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
+
 # This script contains a GUI for interacting with merge conflicts
+
+import sys
+import os
+sys.path.append(RPR_GetResourcePath() + '/Scripts/ReaTeam Extensions/API')
+
+import imgui_python
+import reapy
+import git
+
+def init():
+    global ctx
+    ctx = imgui_python.ImGui_CreateContext('Conflict Resolver')
+    loop()
+
+def loop():
+    imgui_python.ImGui_SetNextWindowSize(ctx, 700, 500, imgui_python.ImGui_Cond_FirstUseEver())
+    visible, open = imgui_python.ImGui_Begin(ctx, 'Conflict Resolver', True)
+
+    if visible:
+        imgui_python.ImGui_Text(ctx, 'Conflict Resolver')
+        imgui_python.ImGui_End(ctx)
+    if open:
+        RPR_defer('loop()')
+
+RPR_defer('init()')
