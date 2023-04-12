@@ -21,9 +21,9 @@ SOFTWARE.
 '''
 
 # This script contains a GUI for interacting with merge conflicts
-
 import sys
 import os
+
 sys.path.append(RPR_GetResourcePath() + '/Scripts/ReaTeam Extensions/API')
 import imgui_python
 import reapy
@@ -31,20 +31,20 @@ import git
 
 def init():
     global ctx
-    # List of dictionaries containing the buttons states for each row
-    global row_states
-    # Reference containing the last button id the user pressed
-    global last_button
-    # Reference containing the last row number the user interacted with
-    global last_row
+    # A dictionary containing the conflict states for each row
+    global conflict_states
     # List of conflicts
     global conflict_list
+    # Reference to last button (id) clicked
+    global last_button
+    # Reference to last row (conflict) clicked
+    global last_conflict
 
     ctx = imgui_python.ImGui_CreateContext('Conflict Resolver')
-    row_states = []
-    last_button = ['00']
-    last_row = [0]
+    conflict_states = {}
     conflict_list = ['Conflict #1', 'Conflict #2', 'Conflict #3']
+    last_button = ['']
+    last_conflict = ['']
     loop()
 
 def loop():
@@ -53,14 +53,19 @@ def loop():
 
     if visible:
         createConflictTable(conflict_list)
-        if imgui_python.ImGui_Button(ctx, 'Finish Resolve'):
-            finishResolve()
+        createResolveButton()
         imgui_python.ImGui_End(ctx)
     if open:
         RPR_defer('loop()')
 
+def createResolveButton():
+    if imgui_python.ImGui_Button(ctx, 'Finish Resolve'):
+        finishResolve()
+
 def finishResolve():
-    reapy.print(row_states)
+    # Show a message with the conflict names and chosen sides for resolution
+    resolution = ", ".join(key for key, value in conflict_states.items() if value == True)
+    reapy.show_message_box(resolution, 'Conflict Resolution:')
 
 def createConflictTable(conflicts):
     num_columns = 3
@@ -81,35 +86,30 @@ def createConflictTable(conflicts):
 def addConflicts(conflicts, num_buttons: int):
     # Render (loop through) each row
     for row in range(0, len(conflicts)):
+        conflict_name = conflicts[row]
         imgui_python.ImGui_TableNextColumn(ctx)
-        imgui_python.ImGui_Text(ctx, conflicts[row])
-        addConflictButtons(row, num_buttons)
+        imgui_python.ImGui_Text(ctx, conflict_name)
+        addConflictButtons(conflict_name, row, num_buttons)
 
-def addConflictButtons(row_number: int, num_buttons: int):
-    # Create a dictionary for the row state if it doesn't exist
-    if not 0 <= row_number < len(row_states):
-        row_states.append({})
-
-    # Get the reference dictionary for the current row being rendered
-    button_states = row_states[row_number]
-
+def addConflictButtons(conflict_name: str, row_number: int, num_buttons: int):
     # Loop through the buttons in this row
     for i in range(0, num_buttons):
         imgui_python.ImGui_TableNextColumn(ctx)
-        button_id = str(row_number) + str(i)
-
-        # If this button doesn't have a state already, add it to the dictionary
-        if button_id not in button_states:
-            button_states[button_id] = False
+        button_id = str(conflict_name) + ' ' + 'Side #' + str(i+1)
+        # Create a dictionary for the row state if it doesn't exist
+        if button_id not in conflict_states:
+            # Set all 'Side #1' buttons on by default
+            conflict_states[button_id] = True if i == 0 else False
 
         # If this button is clicked, do the following:
-        if imgui_python.ImGui_RadioButton(ctx, '##radio_table_' + str(button_id), button_states[button_id]):
-            # Get the row number and id of the clicked button and store them in their respective references
-            last_row[0] = row_number
+        if imgui_python.ImGui_RadioButton(ctx, '##radio_table_' + str(button_id), conflict_states[button_id]):
+            # Set its state to True (on)
+            conflict_states[button_id] = True
+            # Store this state for later usage
             last_button[0] = button_id
-            button_states[button_id] = True
+            last_conflict[0] = conflict_name
         # Deactivate the other buttons in this row
-        if last_row[0] == row_number and button_id != last_button[0]:
-            button_states[button_id] = False
+        if last_conflict[0] == conflict_name and button_id != last_button[0]:
+            conflict_states[button_id] = False
 
 RPR_defer('init()')
