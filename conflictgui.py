@@ -32,7 +32,18 @@ import git
 
 def init():
     global ctx
+    global row_states
+    global last_button
+    global last_row
+    global conflict_list
+    global number_of_sides
+
     ctx = imgui_python.ImGui_CreateContext('Conflict Resolver')
+    row_states = []
+    last_button = ['']
+    last_row = [0]
+    conflict_list = ['Conflict #1', 'Conflict #2', 'Conflict #3']
+    number_of_sides = 2
     loop()
 
 def loop():
@@ -40,9 +51,49 @@ def loop():
     visible, open = imgui_python.ImGui_Begin(ctx, 'Conflict Resolver', True)
 
     if visible:
-        imgui_python.ImGui_Text(ctx, 'Conflict Resolver')
+        createConflictTable(conflict_list)
         imgui_python.ImGui_End(ctx)
     if open:
         RPR_defer('loop()')
+
+def createConflictTable(conflicts):
+    num_columns = 3
+
+    imgui_python.ImGui_BeginTable(ctx, 'Conflict Table', num_columns)
+    imgui_python.ImGui_TableSetupColumn(ctx, '')
+    imgui_python.ImGui_TableSetupColumn(ctx, 'Side #1')
+    imgui_python.ImGui_TableSetupColumn(ctx, 'Side #2')
+    imgui_python.ImGui_TableHeadersRow(ctx)
+
+    addConflicts(conflicts, num_columns-1)
+
+    imgui_python.ImGui_EndTable(ctx)
+
+def addConflicts(conflicts, num_buttons: int):
+    for row in range(0, len(conflicts)):
+        imgui_python.ImGui_TableNextColumn(ctx)
+        imgui_python.ImGui_Text(ctx, conflicts[row])
+        addButtons(row, num_buttons)
+
+def addButtons(row_number: int, num_buttons: int):
+    if not 0 <= row_number < len(row_states):
+        row_states.append({})
+
+    button_states = row_states[row_number]
+
+    for i in range(0, num_buttons):
+        imgui_python.ImGui_TableNextColumn(ctx)
+        button_id = str(row_number) + str(i)
+
+        if button_id not in button_states:
+            button_states[button_id] = False
+
+        if imgui_python.ImGui_RadioButton(ctx, '##radio_table_' + str(button_id), button_states[button_id]):
+            last_row[0] = row_number
+            last_button[0] = button_id
+        elif last_row[0] == row_number:
+            button_states[button_id] = False
+
+        button_states[last_button[0]] = True
 
 RPR_defer('init()')
