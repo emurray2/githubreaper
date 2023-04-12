@@ -25,25 +25,26 @@ SOFTWARE.
 import sys
 import os
 sys.path.append(RPR_GetResourcePath() + '/Scripts/ReaTeam Extensions/API')
-
 import imgui_python
 import reapy
 import git
 
 def init():
     global ctx
+    # List of dictionaries containing the buttons states for each row
     global row_states
+    # Last button the user clicked
     global last_button
+    # Last row the user interacted with
     global last_row
+    # List of conflicts
     global conflict_list
-    global number_of_sides
 
     ctx = imgui_python.ImGui_CreateContext('Conflict Resolver')
     row_states = []
     last_button = ['']
     last_row = [0]
     conflict_list = ['Conflict #1', 'Conflict #2', 'Conflict #3']
-    number_of_sides = 2
     loop()
 
 def loop():
