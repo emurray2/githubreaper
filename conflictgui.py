@@ -42,7 +42,7 @@ def init():
 
     ctx = imgui_python.ImGui_CreateContext('Conflict Resolver')
     row_states = []
-    last_button = ['']
+    last_button = ['00']
     last_row = [0]
     conflict_list = ['Conflict #1', 'Conflict #2', 'Conflict #3']
     loop()
@@ -53,9 +53,14 @@ def loop():
 
     if visible:
         createConflictTable(conflict_list)
+        if imgui_python.ImGui_Button(ctx, 'Finish Resolve'):
+            finishResolve()
         imgui_python.ImGui_End(ctx)
     if open:
         RPR_defer('loop()')
+
+def finishResolve():
+    reapy.print(row_states)
 
 def createConflictTable(conflicts):
     num_columns = 3
@@ -78,9 +83,9 @@ def addConflicts(conflicts, num_buttons: int):
     for row in range(0, len(conflicts)):
         imgui_python.ImGui_TableNextColumn(ctx)
         imgui_python.ImGui_Text(ctx, conflicts[row])
-        addButtons(row, num_buttons)
+        addConflictButtons(row, num_buttons)
 
-def addButtons(row_number: int, num_buttons: int):
+def addConflictButtons(row_number: int, num_buttons: int):
     # Create a dictionary for the row state if it doesn't exist
     if not 0 <= row_number < len(row_states):
         row_states.append({})
@@ -102,12 +107,9 @@ def addButtons(row_number: int, num_buttons: int):
             # Get the row number and id of the clicked button and store them in their respective references
             last_row[0] = row_number
             last_button[0] = button_id
-
+            button_states[button_id] = True
         # Deactivate the other buttons in this row
-        elif last_row[0] == row_number:
+        if last_row[0] == row_number and button_id != last_button[0]:
             button_states[button_id] = False
-
-        # Keep the state of the last button pressed
-        button_states[last_button[0]] = True
 
 RPR_defer('init()')
