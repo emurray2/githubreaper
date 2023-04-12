@@ -99,7 +99,7 @@ def addButtons(row_number: int, num_buttons: int):
 
         # If this button is clicked, do the following:
         if imgui_python.ImGui_RadioButton(ctx, '##radio_table_' + str(button_id), button_states[button_id]):
-            # Get the row number and id of the clicked button and them in their respective references
+            # Get the row number and id of the clicked button and store them in their respective references
             last_row[0] = row_number
             last_button[0] = button_id
 
