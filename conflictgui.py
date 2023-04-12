@@ -95,7 +95,9 @@ def addConflictButtons(conflict_name: str, row_number: int, num_buttons: int):
     # Loop through the buttons in this row
     for i in range(0, num_buttons):
         imgui_python.ImGui_TableNextColumn(ctx)
+
         button_id = str(conflict_name) + ' ' + 'Side #' + str(i+1)
+
         # Create a dictionary for the row state if it doesn't exist
         if button_id not in conflict_states:
             # Set all 'Side #1' buttons on by default
