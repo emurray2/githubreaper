@@ -1,5 +1,6 @@
 # githubreaper
-- A senior capstone project I'm working on with some classmates in school. More details coming soon 👀!
+- A senior capstone project I worked on with some classmates in school. Full code can be found here:
+https://github.com/smissner/REAPERVersionController
 
 ![Commit](/screenshots/commit.png)
 
